@@ -54,7 +54,7 @@ jQuery(document).ready(function() {
 			
 			loadStyle("map/map_style.css", function() {
 				loadScript(
-					"map/OpenLayers.js"
+					"http://openlayers.org/api/OpenLayers.js"
 					, function() {
 				      		loadScript("map/map_script.js"
 				      		, function() {
