@@ -51,6 +51,10 @@ var littleMap = {
 						"select": new OpenLayers.Style({
 							pointRadius: 20,
 							strokeOpacity: 1,
+						}),
+						"highlight": new OpenLayers.Style({
+							pointRadius: 18,
+							strokeOpacity: 0.8,
 						})
 					});
 
@@ -89,12 +93,22 @@ var littleMap = {
 
 				var vectorLayers = littleMap.map.getLayersByClass("OpenLayers.Layer.Vector");
 				
+				littleMap.operations.select.hover = new OpenLayers.Control.SelectFeature(vectorLayers, { //TODO this should be moved to operations!!!
+					"hover": true,
+					"highlightOnly": true,
+					"renderIntent": "highlight",
+                	eventListeners: {
+	                    featurehighlighted: function(e) {
+	                    	//TODO 
+	                    },
+	                    featureunhighlighted: function(e) {
+	                    	//TOD	                    }
+						}	                
+	                }
+				});
+
 				littleMap.operations.select.click = new OpenLayers.Control.SelectFeature(vectorLayers, { //TODO this should be moved to operations!!!
-					"hover": false,
-					"toggle": false,
 					"clickout": true,
-					"multiple": false,
-					"name": "select",
 					onSelect: function(e) {
 						jQuery("#placemarkDescription").html(e.attributes.name);
 						if(e.attributes.additional) {
@@ -107,7 +121,6 @@ var littleMap = {
 							littleMap.map.zoomToExtent(tempLayer.getDataExtent()); 
 						} else {
 							littleMap.map.setCenter(e.geometry.getBounds().getCenterLonLat());
-
 						}
 					},
 					onUnselect: function(e) { 
@@ -118,8 +131,14 @@ var littleMap = {
 						}
 					}
 				});
+
+				littleMap.map.addControl(littleMap.operations.select.hover); //this is now working properly when added after select.click
+				littleMap.operations.select.hover.activate();
+
 				littleMap.map.addControl(littleMap.operations.select.click);
 				littleMap.operations.select.click.activate();
+
+
 			}
 		},
 		layerSwitcher: function() {
@@ -158,8 +177,8 @@ var littleMap = {
 			return feature;			
 		},
 		select: { //TODO
-			click: "", //these two can be instantiated only after layers with placemarks are rendered
-			hover: ""
+			hover: "",
+			click: "" //these two can be instantiated only after layers with placemarks are rendered
 		}
 	},
 	init: function(featureToCenterAt) {
@@ -172,9 +191,7 @@ var littleMap = {
 				littleMap.initialize.layerSwitcher();
 				littleMap.initialize.layers.addSelectControl();
 				littleMap.initialize.center(featureToCenterAt);
-			});
-						
+			});			
 		});
-
 	}
 }
