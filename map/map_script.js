@@ -88,7 +88,10 @@ var littleMap = {
 							var fetchedJSON = JSON.parse(req.responseText);
 									
 							for(var el in fetchedJSON) {
-								littleMap.initialize.layers.addLayer(fetchedJSON[el], el); //adds layer to the map
+								
+								if(fetchedJSON[el].type === 'FeatureCollection') {  //to be sure that part of json can be rendered as vector layer
+									littleMap.initialize.layers.addLayer(fetchedJSON[el], el); //adds layer to the map
+								}
 							}
 							
 							callback(); //callback after all layers are loaded!!!
