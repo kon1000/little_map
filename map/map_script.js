@@ -3,8 +3,9 @@ var littleMap = {
 	config: undefined,
 	initialize: {
 		config: function(callback) {
+			'use strict';
 			OpenLayers.Request.GET({ //fetches config.json for objects
-				url: "map/config.json",
+				url: 'map/config.json',
 				headers: {'Accept':'application/json'},
 				success: function (req) {
 					littleMap.config = JSON.parse(req.responseText);
@@ -14,9 +15,11 @@ var littleMap = {
 		},
 		DOM: {
 			insert: function() {
-				jQuery(".map").html("<div id='mapdiv'></div><div id='control_panel' class='min'><div id='placemarkDescription'></div></div>");
+			'use strict';
+				jQuery('.map').html('<div id="mapdiv"></div><div id="control_panel" class="min"><div id="placemarkDescription"></div></div>');
 			},
-			manage: function() { //TODO			   
+			manage: function() { //TODO
+			'use strict';			   
 			   /*
 				* ataching events to buttons, 
 				* adjusting style according to viewport size
@@ -24,63 +27,67 @@ var littleMap = {
 			}
 		},
 		map: function() {
-			littleMap.map = new OpenLayers.Map("mapdiv", {
+			'use strict';
+			littleMap.map = new OpenLayers.Map('mapdiv', {
 				theme: null
 			});
 		},
 		mapLayers: function() {
+			'use strict';
 			littleMap.map.addLayer(new OpenLayers.Layer.OSM());
 			//in config.json one shound be able to choose base layers (OSM, google maps etc)
 		},
 		layers: {
 			addLayer: function(jsonPart, name, displayInLayerSwitcher) { //adds layers to map
-					var g = new OpenLayers.Format.GeoJSON();
-					var feature_collection = g.read(jsonPart);
+				'use strict';
+				var g = new OpenLayers.Format.GeoJSON();
+				var feature_collection = g.read(jsonPart);
 
-					displayInLayerSwitcher = (displayInLayerSwitcher === undefined) ? true : false;
-					
-					var myStyles = new OpenLayers.StyleMap({ //it should be elswhere probably
-						"default": new OpenLayers.Style({ //if there is no property in feature's json that fragment of style is just not applied ;_; not completely sure how it works...
-							externalGraphic: "${marker}",
-							pointRadius: 15,
-							strokeColor: "${strokeColor}",
-							strokeOpacity: 0.6,
-							strokeWidth: 8,
-							cursor: "pointer"
-						}),
-						"select": new OpenLayers.Style({
-							pointRadius: 20,
-							strokeOpacity: 1,
-						}),
-						"highlight": new OpenLayers.Style({
-							pointRadius: 18,
-							strokeOpacity: 0.8,
-						})
-					});
+				displayInLayerSwitcher = (displayInLayerSwitcher === undefined) ? true : false;
+				
+				var myStyles = new OpenLayers.StyleMap({ //it should be elswhere probably
+					'default': new OpenLayers.Style({ //if there is no property in feature's json that fragment of style is just not applied ;_; not completely sure how it works...
+						externalGraphic: '${marker}',
+						pointRadius: 15,
+						strokeColor: '${strokeColor}',
+						strokeOpacity: 0.6,
+						strokeWidth: 8,
+						cursor: 'pointer'
+					}),
+					'select': new OpenLayers.Style({
+						pointRadius: 20,
+						strokeOpacity: 1,
+					}),
+					'highlight': new OpenLayers.Style({
+						pointRadius: 18,
+						strokeOpacity: 0.8,
+					})
+				});
 
-					var vector_layer = new OpenLayers.Layer.Vector(name, {
-						styleMap: myStyles,
-						displayInLayerSwitcher: displayInLayerSwitcher
-					});
-					
-					for(var i= 0; i < feature_collection.length; i++) {
-						feature_collection[i].geometry.transform(
-							new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-							littleMap.map.getProjectionObject() // to Spherical Mercator Projection
-						);
-						feature_collection[i].fid = feature_collection[i].attributes.name;
-					}
-					vector_layer.addFeatures(feature_collection);
-					littleMap.map.addLayer(vector_layer);
+				var vector_layer = new OpenLayers.Layer.Vector(name, {
+					styleMap: myStyles,
+					displayInLayerSwitcher: displayInLayerSwitcher
+				});
+				
+				for(var i= 0; i < feature_collection.length; i++) {
+					feature_collection[i].geometry.transform(
+						new OpenLayers.Projection('EPSG:4326'), // transform from WGS 1984
+						littleMap.map.getProjectionObject() // to Spherical Mercator Projection
+					);
+					feature_collection[i].fid = feature_collection[i].attributes.name;
+				}
+				vector_layer.addFeatures(feature_collection);
+				littleMap.map.addLayer(vector_layer);
 			},
 			fetch: function(file, callback) {
+				'use strict';
 				OpenLayers.Request.GET({ //fetches global json for objects
 						url: file,
 						headers: {'Accept':'application/json'},
 						success: function (req) {
 							var fetchedJSON = JSON.parse(req.responseText);
 									
-							for(el in fetchedJSON) {
+							for(var el in fetchedJSON) {
 								littleMap.initialize.layers.addLayer(fetchedJSON[el], el); //adds layer to the map
 							}
 							
@@ -90,30 +97,30 @@ var littleMap = {
 				});
 			},
 			addSelectControl: function() { //TODO it should only adding selects
-
-				var vectorLayers = littleMap.map.getLayersByClass("OpenLayers.Layer.Vector");
+				'use strict';	
+				var vectorLayers = littleMap.map.getLayersByClass('OpenLayers.Layer.Vector');
 				
 				littleMap.operations.select.hover = new OpenLayers.Control.SelectFeature(vectorLayers, { //TODO this should be moved to operations!!!
-					"hover": true,
-					"highlightOnly": true,
-					"renderIntent": "highlight",
+					'hover': true,
+					'highlightOnly': true,
+					'renderIntent': 'highlight',
                 	eventListeners: {
-	                    featurehighlighted: function(e) {
+	                    featurehighlighted: function() {
 	                    	//TODO 
 	                    },
-	                    featureunhighlighted: function(e) {
+	                    featureunhighlighted: function() {
 	                    	//TOD	                    }
 						}	                
 	                }
 				});
 
 				littleMap.operations.select.click = new OpenLayers.Control.SelectFeature(vectorLayers, { //TODO this should be moved to operations!!!
-					"clickout": true,
+					'clickout': true,
 					onSelect: function(e) {
-						jQuery("#placemarkDescription").html(e.attributes.name);
+						jQuery('#placemarkDescription').html(e.attributes.name);
 						if(e.attributes.additional) {
-							littleMap.initialize.layers.addLayer(e.attributes.additional, "tempLayer", false); //tempLayer is name for layer used to render additional features of placemark	
-							var tempLayer = littleMap.map.getLayersByName("tempLayer")[0];
+							littleMap.initialize.layers.addLayer(e.attributes.additional, 'tempLayer', false); //tempLayer is name for layer used to render additional features of placemark	
+							var tempLayer = littleMap.map.getLayersByName('tempLayer')[0];
 							tempLayer.setZIndex(e.layer.getZIndex() + 1); //additional features will be over actual feature. Area should be under!!!
 							
 							//zooming to extent of additional placemarks layer
@@ -123,9 +130,9 @@ var littleMap = {
 							littleMap.map.setCenter(e.geometry.getBounds().getCenterLonLat());
 						}
 					},
-					onUnselect: function(e) { 
-						jQuery("#placemarkDescription").html("");
-						var tempLayer = littleMap.map.getLayersByName("tempLayer")[0];
+					onUnselect: function() { 
+						jQuery('#placemarkDescription').html('');
+						var tempLayer = littleMap.map.getLayersByName('tempLayer')[0];
 						if(tempLayer) {
 							tempLayer.destroy();	
 						}
@@ -142,9 +149,11 @@ var littleMap = {
 			}
 		},
 		layerSwitcher: function() {
+			'use strict';
 			littleMap.map.addControl(new OpenLayers.Control.LayerSwitcher());
 		},
 		center: function(selectedFeature) { //without centering OpenLayers will not render map
+			'use strict';
 			if(selectedFeature) {
 				var featureToCenter = littleMap.operations.getFromMapByFid(selectedFeature);
 				var selectClick = littleMap.operations.select.click;
@@ -156,7 +165,7 @@ var littleMap = {
 			} else {
 				var lonLat = new OpenLayers.LonLat(littleMap.config.defaultCenter.lon, littleMap.config.defaultCenter.lat) //thsi is default point of centering- values are fetched from config.json
 						.transform(
-							new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+							new OpenLayers.Projection('EPSG:4326'), // transform from WGS 1984
 							littleMap.map.getProjectionObject() // to Spherical Mercator Projection
 						);
 				var zoom=13;
@@ -167,7 +176,8 @@ var littleMap = {
 	},
 	operations: {
 		getFromMapByFid: function(fid) {
-			var vectorLayers = littleMap.map.getLayersByClass("OpenLayers.Layer.Vector");
+			'use strict';
+			var vectorLayers = littleMap.map.getLayersByClass('OpenLayers.Layer.Vector');
 			var feature;
 			vectorLayers.forEach(function(l) {
 				if(l.getFeatureByFid(fid)){
@@ -177,21 +187,22 @@ var littleMap = {
 			return feature;			
 		},
 		select: { //TODO
-			hover: "",
-			click: "" //these two can be instantiated only after layers with placemarks are rendered
+			hover: undefined,
+			click: undefined //these two can be instantiated only after layers with placemarks are rendered
 		}
 	},
 	init: function(featureToCenterAt) {
+		'use strict';
 		littleMap.initialize.config(function() {
 			littleMap.initialize.DOM.insert();
 			littleMap.initialize.DOM.manage();
 			littleMap.initialize.map();
 			littleMap.initialize.mapLayers();
-			littleMap.initialize.layers.fetch("map/objects/objects.json", function() {
+			littleMap.initialize.layers.fetch('map/objects/objects.json', function() {
 				littleMap.initialize.layerSwitcher();
 				littleMap.initialize.layers.addSelectControl();
 				littleMap.initialize.center(featureToCenterAt);
 			});			
 		});
 	}
-}
+};
