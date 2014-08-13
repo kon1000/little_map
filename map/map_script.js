@@ -31,7 +31,7 @@ var littleMap = {
 		},
 		mapLayers: function() {
 			littleMap.map.addLayer(new OpenLayers.Layer.OSM());
-			//in config.json one shound be able to choose base layers (OSM, google maps etc)
+			// TODO in config.json one shound be able to choose base layers (OSM, google maps etc)
 		},
 		layers: {
 			addLayer: function(jsonPart, name, displayInLayerSwitcher) { //adds layers to map
@@ -47,10 +47,12 @@ var littleMap = {
 							strokeColor: '${strokeColor}',
 							strokeOpacity: 0.6,
 							strokeWidth: 8,
-							cursor: 'pointer'
+							cursor: 'pointer',
+							graphicYOffset: -29
 						}),
 						'select': new OpenLayers.Style({
 							pointRadius: 20,
+							graphicYOffset: -39,
 							strokeOpacity: 1,
 						}),
 						'highlight': new OpenLayers.Style({
@@ -101,65 +103,51 @@ var littleMap = {
 			addSelectControl: function() { //TODO it should only adding selects
 				var vectorLayers = littleMap.map.getLayersByClass('OpenLayers.Layer.Vector');
 				
-				littleMap.operations.select.hover = new OpenLayers.Control.SelectFeature(vectorLayers, { //TODO this should be moved to operations!!!
-					/* This is working but there are issues with styles:
-						-style after unhighlight style does not back to initial style
-						-hightlight changes style of selected (by click) feature
-						-test some more to find more bugs -> rewrite whole selecting part...
-					*/
-					'hover': true,
-					'highlightOnly': true,
-					'renderIntent': 'highlight',
+				littleMap.operations.select = new OpenLayers.Control.SelectFeature(vectorLayers, { //instance of this is in littleMap.operations.select
+					'clickout': true,
 					'callbacks': {
-						'out': function(event) {
-							if(event.popup) {
-								littleMap.map.removePopup(event.popup);
-								event.popup = null;
-							}
+						'over': function(f) { //f means function get reference to feature
+							
+							f.popup = new OpenLayers.Popup("chicken", //this is basic ugly white div TODO style!!!
+								f.geometry.getBounds().getCenterLonLat(), //TODO if feature is not a point popup should render in place of cursor
+								null,
+								f.attributes.name,
+								true);
+								
+							f.popup.autoSize = true;
+							f.popup.panMapIfOutOfView = true;
+							f.popup.keepInMap = true;
+
+							littleMap.map.addPopup(f.popup);
+						},
+						'out': function(f) {
+							try {
+								f.popup.destroy();
+							} catch(e) {
+							
+							}	
 						}
 					},
-                	'eventListeners': {
-	                    featurehighlighted: function(e) {
-							console.log("higlight:", e);
-							
-							e.feature.popup = new OpenLayers.Popup.FramedCloud("chicken",
-								e.feature.geometry.getBounds().getCenterLonLat(), //TODO if feature is not point popup should render in place of cursor
-								null,
-								e.feature.attributes.name,
-								null, true, function() {
-									e.feature.popup.destroy();
-								}
-							);
-
-							littleMap.map.addPopup(e.feature.popup); 
-	                    },
-						featureunhighlighted: function(e) {
-							console.log(e);
-							e.feature.renderIntent = "default";
+					'onSelect': function(f) { //f means function get reference to feature
+						try {
+							f.popup.destroy();
+						} catch(e) {
+						
 						}
-	                }
-				});
-
-				littleMap.operations.select.click = new OpenLayers.Control.SelectFeature(vectorLayers, { //TODO this should be moved to operations!!!
-					'clickout': true,
-					onSelect: function(e) {
-						if(e.popup) {
-							e.popup.destroy();
-						}
-						jQuery('#placemarkDescription').html(e.attributes.name);
-						if(e.attributes.additional) {
-							littleMap.initialize.layers.addLayer(e.attributes.additional, 'tempLayer', false); //tempLayer is name for layer used to render additional features of placemark	
+						jQuery('#placemarkDescription').html(f.attributes.name);
+						if(f.attributes.additional) {
+							littleMap.initialize.layers.addLayer(f.attributes.additional, 'tempLayer', false); //tempLayer is name for layer used to render additional features of placemark	
 							var tempLayer = littleMap.map.getLayersByName('tempLayer')[0];
-							tempLayer.setZIndex(e.layer.getZIndex() + 1); //additional features will be over actual feature. Area should be under!!!
+							tempLayer.setZIndex(f.layer.getZIndex() + 1); //additional features will be over actual feature. Area should be under!!!
 							
 							//zooming to extent of additional placemarks layer
 							littleMap.map.setCenter(tempLayer.getDataExtent().getCenterLonLat()); 
 							littleMap.map.zoomToExtent(tempLayer.getDataExtent()); 
 						} else {
-							littleMap.map.setCenter(e.geometry.getBounds().getCenterLonLat());
+							littleMap.map.setCenter(f.geometry.getBounds().getCenterLonLat());
 						}
 					},
-					onUnselect: function() { 
+					'onUnselect': function() { 
 						jQuery('#placemarkDescription').html('');
 						var tempLayer = littleMap.map.getLayersByName('tempLayer')[0];
 						if(tempLayer) {
@@ -168,12 +156,8 @@ var littleMap = {
 					}
 				});
 
-				littleMap.map.addControl(littleMap.operations.select.hover); //this is now working properly when added after select.click
-				littleMap.operations.select.hover.activate();
-
-				littleMap.map.addControl(littleMap.operations.select.click);
-				littleMap.operations.select.click.activate();
-
+				littleMap.map.addControl(littleMap.operations.select);
+				littleMap.operations.select.activate();
 
 			}
 		},
@@ -183,11 +167,11 @@ var littleMap = {
 		center: function(selectedFeature) { //without centering OpenLayers will not render map
 			if(selectedFeature) {
 				var featureToCenter = littleMap.operations.getFromMapByFid(selectedFeature);
-				var selectClick = littleMap.operations.select.click;
+				var selectClick = littleMap.operations.select;
 
 				littleMap.map.zoomTo(15);
-				selectClick.select(featureToCenter);
-				//selectClick.highlight(featureToCenter); //this is for changing style// ugly hack TODO remove!!!
+				selectClick.select(featureToCenter); //;_; why this is not highlighting feature??...
+				selectClick.highlight(featureToCenter); //this is for changing style// ugly hack TODO remove!!!
  
 			} else {
 				var lonLat = new OpenLayers.LonLat(littleMap.config.defaultCenter.lon, littleMap.config.defaultCenter.lat) //thsi is default point of centering- values are fetched from config.json
@@ -212,10 +196,7 @@ var littleMap = {
 			});
 			return feature;			
 		},
-		select: { //TODO
-			hover: undefined,
-			click: undefined //these two can be instantiated only after layers with placemarks are rendered
-		}
+		select: undefined
 	},
 	init: function(featureToCenterAt) {
 		littleMap.initialize.config(function() {
