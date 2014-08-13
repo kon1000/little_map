@@ -76,7 +76,7 @@ var littleMap = {
 					vector_layer.addFeatures(feature_collection);
 					littleMap.map.addLayer(vector_layer);
 				} catch(e) {
-					console.log(e);
+				
 				}
 
 				
@@ -119,7 +119,6 @@ var littleMap = {
 					'clickout': true,
 					'callbacks': {
 						'over': function(f) { //f means function get reference to feature
-							console.log(f);
 							var popupCener;
 							if(f.geometry.CLASS_NAME !== "OpenLayers.Geometry.Point") {
 								popupCener = littleMap.map.getLonLatFromPixel(littleMap.operations.mousePosition.lastXy);
