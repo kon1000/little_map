@@ -1,9 +1,9 @@
+'use strict';
 var littleMap = {
 	map: undefined,
 	config: undefined,
 	initialize: {
 		config: function(callback) {
-			'use strict';
 			OpenLayers.Request.GET({ //fetches config.json for objects
 				url: 'map/config.json',
 				headers: {'Accept':'application/json'},
@@ -15,11 +15,9 @@ var littleMap = {
 		},
 		DOM: {
 			insert: function() {
-			'use strict';
 				jQuery('.map').html('<div id="mapdiv"></div><div id="control_panel" class="min"><div id="placemarkDescription"></div></div>');
 			},
 			manage: function() { //TODO
-			'use strict';			   
 			   /*
 				* ataching events to buttons, 
 				* adjusting style according to viewport size
@@ -27,19 +25,16 @@ var littleMap = {
 			}
 		},
 		map: function() {
-			'use strict';
 			littleMap.map = new OpenLayers.Map('mapdiv', {
 				theme: null
 			});
 		},
 		mapLayers: function() {
-			'use strict';
 			littleMap.map.addLayer(new OpenLayers.Layer.OSM());
 			//in config.json one shound be able to choose base layers (OSM, google maps etc)
 		},
 		layers: {
 			addLayer: function(jsonPart, name, displayInLayerSwitcher) { //adds layers to map
-				'use strict';
 				var g = new OpenLayers.Format.GeoJSON();
 				var feature_collection = g.read(jsonPart);
 
@@ -80,7 +75,6 @@ var littleMap = {
 				littleMap.map.addLayer(vector_layer);
 			},
 			fetch: function(file, callback) {
-				'use strict';
 				OpenLayers.Request.GET({ //fetches global json for objects
 						url: file,
 						headers: {'Accept':'application/json'},
@@ -100,7 +94,6 @@ var littleMap = {
 				});
 			},
 			addSelectControl: function() { //TODO it should only adding selects
-				'use strict';	
 				var vectorLayers = littleMap.map.getLayersByClass('OpenLayers.Layer.Vector');
 				
 				littleMap.operations.select.hover = new OpenLayers.Control.SelectFeature(vectorLayers, { //TODO this should be moved to operations!!!
@@ -152,11 +145,9 @@ var littleMap = {
 			}
 		},
 		layerSwitcher: function() {
-			'use strict';
 			littleMap.map.addControl(new OpenLayers.Control.LayerSwitcher());
 		},
 		center: function(selectedFeature) { //without centering OpenLayers will not render map
-			'use strict';
 			if(selectedFeature) {
 				var featureToCenter = littleMap.operations.getFromMapByFid(selectedFeature);
 				var selectClick = littleMap.operations.select.click;
@@ -179,7 +170,6 @@ var littleMap = {
 	},
 	operations: {
 		getFromMapByFid: function(fid) {
-			'use strict';
 			var vectorLayers = littleMap.map.getLayersByClass('OpenLayers.Layer.Vector');
 			var feature;
 			vectorLayers.forEach(function(l) {
@@ -195,7 +185,6 @@ var littleMap = {
 		}
 	},
 	init: function(featureToCenterAt) {
-		'use strict';
 		littleMap.initialize.config(function() {
 			littleMap.initialize.DOM.insert();
 			littleMap.initialize.DOM.manage();
