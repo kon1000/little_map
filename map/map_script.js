@@ -37,42 +37,47 @@ var littleMap = {
 			addLayer: function(jsonPart, name, displayInLayerSwitcher) { //adds layers to map
 				var g = new OpenLayers.Format.GeoJSON();
 				var feature_collection = g.read(jsonPart);
+				try { //if jsonPart does not contain proper geojson data whole map will render 
+					displayInLayerSwitcher = (displayInLayerSwitcher === undefined) ? true : false;
+					
+					var myStyles = new OpenLayers.StyleMap({ //it should be elswhere probably
+						'default': new OpenLayers.Style({ //if there is no property in feature's json that fragment of style is just not applied ;_; not completely sure how it works...
+							externalGraphic: '${marker}',
+							pointRadius: 15,
+							strokeColor: '${strokeColor}',
+							strokeOpacity: 0.6,
+							strokeWidth: 8,
+							cursor: 'pointer'
+						}),
+						'select': new OpenLayers.Style({
+							pointRadius: 20,
+							strokeOpacity: 1,
+						}),
+						'highlight': new OpenLayers.Style({
+							pointRadius: 18,
+							strokeOpacity: 0.8,
+						})
+					});
 
-				displayInLayerSwitcher = (displayInLayerSwitcher === undefined) ? true : false;
-				
-				var myStyles = new OpenLayers.StyleMap({ //it should be elswhere probably
-					'default': new OpenLayers.Style({ //if there is no property in feature's json that fragment of style is just not applied ;_; not completely sure how it works...
-						externalGraphic: '${marker}',
-						pointRadius: 15,
-						strokeColor: '${strokeColor}',
-						strokeOpacity: 0.6,
-						strokeWidth: 8,
-						cursor: 'pointer'
-					}),
-					'select': new OpenLayers.Style({
-						pointRadius: 20,
-						strokeOpacity: 1,
-					}),
-					'highlight': new OpenLayers.Style({
-						pointRadius: 18,
-						strokeOpacity: 0.8,
-					})
-				});
-
-				var vector_layer = new OpenLayers.Layer.Vector(name, {
-					styleMap: myStyles,
-					displayInLayerSwitcher: displayInLayerSwitcher
-				});
-				
-				for(var i= 0; i < feature_collection.length; i++) {
-					feature_collection[i].geometry.transform(
-						new OpenLayers.Projection('EPSG:4326'), // transform from WGS 1984
-						littleMap.map.getProjectionObject() // to Spherical Mercator Projection
-					);
-					feature_collection[i].fid = feature_collection[i].attributes.name;
+					var vector_layer = new OpenLayers.Layer.Vector(name, {
+						styleMap: myStyles,
+						displayInLayerSwitcher: displayInLayerSwitcher
+					});
+					
+					for(var i= 0; i < feature_collection.length; i++) {
+						feature_collection[i].geometry.transform(
+							new OpenLayers.Projection('EPSG:4326'), // transform from WGS 1984
+							littleMap.map.getProjectionObject() // to Spherical Mercator Projection
+						);
+						feature_collection[i].fid = feature_collection[i].attributes.name;
+					}
+					vector_layer.addFeatures(feature_collection);
+					littleMap.map.addLayer(vector_layer);
+				} catch(e) {
+					console.log(e);
 				}
-				vector_layer.addFeatures(feature_collection);
-				littleMap.map.addLayer(vector_layer);
+
+				
 			},
 			fetch: function(file, callback) {
 				OpenLayers.Request.GET({ //fetches global json for objects
