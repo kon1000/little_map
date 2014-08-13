@@ -101,15 +101,34 @@ var littleMap = {
 				});
 			},
 			addSelectControl: function() { //TODO it should only adding selects
+				
+				/*
+				 * Mouse position control
+				 */
+				 
+				littleMap.operations.mousePosition = new OpenLayers.Control.MousePosition();
+				littleMap.map.addControl(littleMap.operations.mousePosition);
+				
+				/*
+				 * Feature selecting control
+				 */
+				
 				var vectorLayers = littleMap.map.getLayersByClass('OpenLayers.Layer.Vector');
 				
 				littleMap.operations.select = new OpenLayers.Control.SelectFeature(vectorLayers, { //instance of this is in littleMap.operations.select
 					'clickout': true,
 					'callbacks': {
 						'over': function(f) { //f means function get reference to feature
+							console.log(f);
+							var popupCener;
+							if(f.geometry.CLASS_NAME !== "OpenLayers.Geometry.Point") {
+								popupCener = littleMap.map.getLonLatFromPixel(littleMap.operations.mousePosition.lastXy);
+							} else {
+								popupCener = f.geometry.getBounds().getCenterLonLat();
+							}
 							
 							f.popup = new OpenLayers.Popup("chicken", //this is basic ugly white div TODO style!!!
-								f.geometry.getBounds().getCenterLonLat(), //TODO if feature is not a point popup should render in place of cursor
+								popupCener,
 								null,
 								f.attributes.name,
 								true);
@@ -185,8 +204,8 @@ var littleMap = {
 			}
 		}
 	},
-	operations: {
-		getFromMapByFid: function(fid) {
+	'operations': {
+		'getFromMapByFid': function(fid) {
 			var vectorLayers = littleMap.map.getLayersByClass('OpenLayers.Layer.Vector');
 			var feature;
 			vectorLayers.forEach(function(l) {
@@ -196,7 +215,8 @@ var littleMap = {
 			});
 			return feature;			
 		},
-		select: undefined
+		'select': undefined,
+		'mousePosition': undefined
 	},
 	init: function(featureToCenterAt) {
 		littleMap.initialize.config(function() {
