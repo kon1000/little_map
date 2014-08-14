@@ -138,7 +138,7 @@ var littleMap = {
 							tempLayer.setZIndex(f.layer.getZIndex() + 1); //additional features will be over actual feature. Area should be under!!!
 							
 							//zooming to extent of additional placemarks layer
-							littleMap.map.setCenter(tempLayer.getDataExtent().getCenterLonLat()); 
+							littleMap.map.setCenter(tempLayer.getDataExtent().getCenterLonLat()); //this is wrong e.g. if layer is ring track it shows onli little part of placemark layer!!!
 							littleMap.map.zoomToExtent(tempLayer.getDataExtent()); 
 						} else {
 							littleMap.map.setCenter(f.geometry.getBounds().getCenterLonLat());
