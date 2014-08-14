@@ -489,3 +489,10 @@ img.olTileImage {
 	background: url("img/loader.gif") 50% 50% repeat #ffffff; /*TODO rethink!!*/
 	position: relative;
 }
+
+.map p#hint {
+	position: absolute;
+	bottom: 0px;
+	z-index: 1000;
+	background-color: rgba(0,0,0, 0.5); /*TODO make versions for different browsers*/
+}

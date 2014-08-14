@@ -15,7 +15,7 @@ var littleMap = {
 		},
 		DOM: {
 			insert: function() {
-				jQuery('.map').html('<div id="mapdiv"></div><div id="control_panel" class="min"><div id="placemarkDescription"></div></div>');
+				jQuery('.map').html('<div id="mapdiv"><p id="hint"></p></div><div id="control_panel" class="min"><div id="placemarkDescription"></div></div>');
 			},
 			manage: function() { //TODO
 			   /*
@@ -119,31 +119,10 @@ var littleMap = {
 					'clickout': true,
 					'callbacks': {
 						'over': function(f) { //f means function get reference to feature
-							var popupCener;
-							if(f.geometry.CLASS_NAME !== "OpenLayers.Geometry.Point") {
-								popupCener = littleMap.map.getLonLatFromPixel(littleMap.operations.mousePosition.lastXy);
-							} else {
-								popupCener = f.geometry.getBounds().getCenterLonLat();
-							}
-							
-							f.popup = new OpenLayers.Popup("chicken", //this is basic ugly white div TODO style!!!
-								popupCener,
-								null,
-								f.attributes.name,
-								true);
-								
-							f.popup.autoSize = true;
-							f.popup.panMapIfOutOfView = true;
-							f.popup.keepInMap = true;
-
-							littleMap.map.addPopup(f.popup);
+							jQuery('#hint').html(f.attributes.name);
 						},
 						'out': function(f) {
-							try {
-								f.popup.destroy();
-							} catch(e) {
-							
-							}	
+							jQuery('#hint').html('');	
 						}
 					},
 					'onSelect': function(f) { //f means function get reference to feature
