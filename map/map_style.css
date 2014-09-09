@@ -7,6 +7,7 @@ div.olMap {
 }
 div.olMapViewport {
     text-align: left;
+    background: url("img/loader.gif") 50% 50% repeat #ffffff;
 }
 div.olLayerDiv {
     -moz-user-select: none;
@@ -482,17 +483,142 @@ img.olTileImage {
 	margin: 0;
 }
 
+/*--------------MAP---------------------*/
+
 .map{
 	width: 100%;
-	height: 350px;
 	margin: 0 auto;
-	background: url("img/loader.gif") 50% 50% repeat #ffffff; /*TODO rethink!!*/
 	position: relative;
+	border: 3px 3px 3px 0;
+	border-color: black
 }
 
 .map p#hint {
 	position: absolute;
 	bottom: 0px;
 	z-index: 1000;
-	background-color: rgba(0,0,0, 0.5); /*TODO make versions for different browsers*/
+	background: rgba(255,255,255,0.8);
+	padding: 3px;
+	font-weight: bold;
 }
+
+.map[data-size=jumbo] {
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 80px;
+}
+
+.map[data-size=jumbo] #mapdiv {
+  height: 100%;
+  position: absolute;
+  width: 70%;
+  right: 0px;
+}
+
+.map[data-size=jumbo] #placemarkDescription {
+  position: absolute;
+  left: 0px;
+  width: 30%;
+  height: 100%;
+}
+
+#placemarkDescription {
+  overflow-y: auto;
+}
+
+#mapdiv {
+	height: 350px;
+	/*background: url("img/loader.gif") 50% 50% repeat #ffffff; /*TODO rethink!!*/
+	width: 80%; /*this will be manage by script*/
+	position: relative;
+}
+
+#open_map_button {
+	position: absolute;
+	z-index: 1000;
+	right: 50px;
+}
+
+
+
+
+
+*[data-fid] {
+	cursor:pointer;
+	transition: 0.3s ease;
+}
+
+*[data-fid]:hover {
+	background-color: gray !important;
+}
+
+.map_link {
+	text-decoration: underline;
+	color: red;
+	cursor: pointer;
+}
+
+.map_link: hover {
+	color: green;
+}
+
+/*feature switcher*/
+#feature_switcher {
+	display: inline-block;		
+}
+
+#feature_switcher > h2 {
+	background-color: white;
+	height: 10%;
+}
+
+#feature_switcher > ul {
+	list-style-type: none;
+	padding: 0;
+	height: 90%;
+	overflow-y: auto;
+}
+
+#feature_switcher > ul > li {
+	padding: 0.5em;
+	border-bottom: 2px solid black;
+}
+
+#feature_switcher > ul > li.odd {
+	background-color: #f3faff;
+}
+
+#feature_switcher > ul > li.even {
+	background-color: #e0f0ff;
+}
+
+#little_map_controls_div {
+	height: 50px;
+	background-color: #8FD64D;
+}
+
+#l_sw {
+	display: inline-block;
+	float: right;
+	line-height: 50px;
+	padding: 0 1em;
+	cursor: pointer;
+}
+
+#l_sw:hover {
+	background-color: #75c32d;
+}
+
+.layersDiv {
+	position: absolute;
+	right: 0px;
+	padding: 1em;
+	background-color: white;
+	z-index: 10000;
+	line-height: 20px;
+}
+
+
+
