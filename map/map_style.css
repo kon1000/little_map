@@ -529,28 +529,34 @@ img.olTileImage {
 }
 
 #mapdiv {
-	height: 350px;
+	height: 300px;
 	/*background: url("img/loader.gif") 50% 50% repeat #ffffff; /*TODO rethink!!*/
-	width: 80%; /*this will be manage by script*/
 	position: relative;
 }
 
 #open_map_button {
 	position: absolute;
 	z-index: 1000;
-	right: 50px;
+	right: 10px;
+	top: 60px;
 }
 
 
 
 
 
-*[data-fid] {
+*[data-fid],
+*[data-cat] {
 	cursor:pointer;
-	transition: 0.3s ease;
+	-webkit-transition: all 0.2s ease;
+	-moz-transition: all 0.2s ease;
+	-ms-transition: all 0.2s ease;
+	-o-transition: all 0.2s ease;
+	transition: all 0.2s ease;
 }
 
-*[data-fid]:hover {
+*[data-fid]:hover,
+*[data-cat]:hover {
 	background-color: gray !important;
 }
 
@@ -592,6 +598,10 @@ img.olTileImage {
 
 #feature_switcher > ul > li.even {
 	background-color: #e0f0ff;
+}
+
+#feature_switcher > select {
+	margin: 10px 0 0 10px;
 }
 
 #little_map_controls_div {
