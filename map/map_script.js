@@ -684,7 +684,14 @@ littleMap.featureSwitcher = { //TODO it should be object
 	featureSwitcher.append(list);
 	
     }
-	
+
+
+    /*
+     * WARNING THIS is wrong
+     * <select> does not have such events as click, etc.
+     * workinkg only in FF
+     * needs to be rewritten!
+     */
     jQuery('*[data-cat]').on({ //TODO this needs tweaking
       mouseenter: "",
       mouseleave: "",
